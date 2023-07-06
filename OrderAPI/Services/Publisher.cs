@@ -22,12 +22,13 @@ public class Publisher : IPublisher
         var connection = factory.CreateConnection();
         using var channel = connection.CreateModel();
 
-        channel.QueueDeclare(queue: "Order-Queue", durable: true, exclusive: false, autoDelete: false, arguments: null);
+        //channel.QueueDeclare(queue: "Order-Queue", durable: true, exclusive: false, autoDelete: false, arguments: null);
+        channel.ExchangeDeclare(exchange: "Order-Exchange", type: ExchangeType.Direct);
 
         var jsonString = JsonSerializer.Serialize(message);
         var body = Encoding.UTF8.GetBytes(jsonString);
 
-        channel.BasicPublish(exchange: "", routingKey: "Order-Queue", null, body: body);
+        channel.BasicPublish(exchange: "Order-Exchange", routingKey: "Order.Init", null, body: body);
 
     }
 }

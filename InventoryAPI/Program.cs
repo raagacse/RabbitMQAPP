@@ -1,5 +1,4 @@
 using InventoryAPI.ListenerService;
-using InventoryAPI.Services;
 using InventoryAPI.Subscriber;
 
 var builder = WebApplication.CreateBuilder(args);
