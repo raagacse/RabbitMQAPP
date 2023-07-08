@@ -16,13 +16,4 @@ public class InventoryController : ControllerBase
         _subscriber = subscriber;
     }
 
-    [HttpGet]
-    [Route("ReceiveMsg")]
-    public IActionResult ReceiveMsg()
-    {
-        Console.WriteLine("---------Receive Message -----------");
-        _subscriber.Subscribe();
-        return Ok();
-    }
-
 }

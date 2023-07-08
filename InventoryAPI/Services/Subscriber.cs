@@ -4,12 +4,12 @@ using RabbitMQ.Client.Events;
 
 namespace InventoryAPI.Subscriber;
 
-public class Consumer : ISubscriber
+public class Subscriber : ISubscriber, IDisposable
 {
-    public void Subscribe()
+    private IConnection _connection;
+    private IModel _channel;
+    public Subscriber()
     {
-        Console.WriteLine("Message - Started");
-        //Create ConnectionFactory
         var factory = new ConnectionFactory()
         {
             HostName = "localhost",
@@ -19,13 +19,20 @@ public class Consumer : ISubscriber
         };
 
         //Create Connetion
-        var connection = factory.CreateConnection();
-        using var channel = connection.CreateModel();
-        channel.ExchangeDeclare(exchange: "Order-Exchange", type: ExchangeType.Direct);
-        channel.QueueDeclare(queue: "Order-Queue", durable: true, exclusive: false, autoDelete: false, arguments: null);
-        channel.QueueBind(queue: "Order-Queue", exchange: "Order-Exchange", routingKey: "Order.Init");
-        channel.BasicQos(0, 1, false);
-        var consumer = new EventingBasicConsumer(channel);
+        _connection = factory.CreateConnection();
+        _channel = _connection.CreateModel();
+        _channel.ExchangeDeclare(exchange: "Order-Exchange", type: ExchangeType.Direct);
+        _channel.QueueDeclare(queue: "Order-Queue", durable: true, exclusive: false, autoDelete: false, arguments: null);
+        _channel.QueueBind(queue: "Order-Queue", exchange: "Order-Exchange", routingKey: "Order.Init");
+        _channel.BasicQos(0, 1, false);
+
+    }
+    public void ReadMessage()
+    {
+        Console.WriteLine("Message - Started");
+        //Create ConnectionFactory
+
+        var consumer = new EventingBasicConsumer(_channel);
         consumer.Received += (model, eventArg) =>
         {
             var body = eventArg.Body.ToArray();
@@ -33,7 +40,21 @@ public class Consumer : ISubscriber
             Console.WriteLine($"Message Received: {message}");
         };
 
-        channel.BasicConsume(queue: "Order-Queue", autoAck: true, consumer);
+        _channel.BasicConsume(queue: "Order-Queue", autoAck: true, consumer);
     }
+
+    public void Dispose()
+    {
+        if (_connection.IsOpen)
+        {
+            _connection.Close();
+        }
+        if (_channel.IsOpen)
+        {
+            _channel.Close();
+        }
+    }
+
+
 }
 

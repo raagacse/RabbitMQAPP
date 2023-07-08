@@ -17,13 +17,12 @@ public class OrderListener : BackgroundService
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("---Start Async---");
+        _subscriber.ReadMessage();
         await Task.CompletedTask;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("---Exec Async---");
-        _subscriber.Subscribe();
         await Task.CompletedTask;
     }
 

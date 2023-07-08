@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OrderAPI.Models;
 using OrderAPI.Publisher;
+using SharedLibrary;
 
 namespace OrderAPI.Controllers;
 

@@ -4,7 +4,7 @@ using InventoryAPI.Subscriber;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddSingleton<ISubscriber, Consumer>();
+builder.Services.AddSingleton<ISubscriber, Subscriber>();
 builder.Services.AddHostedService<OrderListener>();
 
 builder.Services.AddControllers();

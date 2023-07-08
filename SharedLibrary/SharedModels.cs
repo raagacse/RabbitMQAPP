@@ -1,4 +1,5 @@
-namespace InventoryAPI.Models;
+﻿namespace SharedLibrary;
+
 public class Order
 {
     public int productId { get; set; }
