@@ -121,6 +121,17 @@ builder.Services.AddSingleton<IPublisher, Publisher>();
 
 # Subscriber API
 
+Create OrderAPI to producer message
+```
+dotnet new webapi -n InventoryAPI
+```
+
+Add RabbitMQ.Client package in subscriber API
+
+```
+dotnet add package RabbitMQ.Client
+```
+
 ## RabbitMQ Configuration in Order API
 
 RabbitMQ configured in appsettings.json
