@@ -39,8 +39,9 @@ Run the below command
 ```
 docker-compose up
 ```
+## Publisher API
 
-## RabbitMQ Configuration in Order API
+# RabbitMQ Configuration in Order API
 
 RabbitMQ configured in appsettings.json
 ```
@@ -51,8 +52,7 @@ RabbitMQ configured in appsettings.json
     "VirtualHost": "/"
   }
 ```
-
-IPublisher.cs
+# IPublisher.cs
 ```
 namespace OrderAPI.Publisher;
 
@@ -121,9 +121,21 @@ builder.Services.Configure<RabbitMQConfig>(builder.Configuration.GetSection(Rabb
 builder.Services.AddSingleton<IPublisher, Publisher>();
 ```
 
-##Subacriber API
+## Subacriber API
 
-ISubscriber.cs
+# RabbitMQ Configuration in Order API
+
+RabbitMQ configured in appsettings.json
+```
+ "RabbitMQ": {
+    "HostName": "localhost",
+    "UserName": "user",
+    "Password": "mypass",
+    "VirtualHost": "/"
+  }
+```
+
+# ISubscriber.cs
 ```
 namespace InventoryAPI.Subscriber;
 
@@ -197,7 +209,7 @@ public class Subscriber : ISubscriber, IDisposable
 
 ```
 
-#BackgroundService.cs
+# BackgroundService.cs
 ```
 using InventoryAPI.Subscriber;
 
