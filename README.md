@@ -119,7 +119,7 @@ builder.Services.Configure<RabbitMQConfig>(builder.Configuration.GetSection(Rabb
 builder.Services.AddSingleton<IPublisher, Publisher>();
 ```
 
-# Subacriber API
+# Subscriber API
 
 ## RabbitMQ Configuration in Order API
 
