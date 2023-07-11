@@ -35,15 +35,13 @@ services:
       - 15672:15672
 
 ```
-Run the below command
+## Run the below command
 ```
 docker-compose up
 ```
-## Publisher API
+# Publisher API
 
-# RabbitMQ Configuration in Order API
-
-RabbitMQ configured in appsettings.json
+## RabbitMQ configured in appsettings.json
 ```
  "RabbitMQ": {
     "HostName": "localhost",
@@ -52,7 +50,7 @@ RabbitMQ configured in appsettings.json
     "VirtualHost": "/"
   }
 ```
-# IPublisher.cs
+## IPublisher.cs
 ```
 namespace OrderAPI.Publisher;
 
@@ -63,7 +61,7 @@ public interface IPublisher
 
 ```
 
-Publisher.cs
+## Publisher.cs
 ```
 using System.Text;
 using System.Text.Json;
@@ -114,16 +112,16 @@ public class Publisher : IPublisher
 
 ```
 
-Program.cs
+## Program.cs
 ```
 // Add services to the container.
 builder.Services.Configure<RabbitMQConfig>(builder.Configuration.GetSection(RabbitMQConfig.RabbitMQ));
 builder.Services.AddSingleton<IPublisher, Publisher>();
 ```
 
-## Subacriber API
+# Subacriber API
 
-# RabbitMQ Configuration in Order API
+## RabbitMQ Configuration in Order API
 
 RabbitMQ configured in appsettings.json
 ```
@@ -135,7 +133,7 @@ RabbitMQ configured in appsettings.json
   }
 ```
 
-# ISubscriber.cs
+## ISubscriber.cs
 ```
 namespace InventoryAPI.Subscriber;
 
@@ -145,7 +143,7 @@ public interface ISubscriber
 }
 ```
 
-Subscriber.cs
+## Subscriber.cs
 ```
 using System.Text;
 using RabbitMQ.Client;
@@ -209,7 +207,7 @@ public class Subscriber : ISubscriber, IDisposable
 
 ```
 
-# BackgroundService.cs
+## BackgroundService.cs
 ```
 using InventoryAPI.Subscriber;
 
@@ -246,7 +244,7 @@ public class OrderListener : BackgroundService
 }
 ```
 
-Program.cs
+## Program.cs
 ```
 // Add services to the container.
 builder.Services.AddSingleton<ISubscriber, Subscriber>();
