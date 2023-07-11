@@ -113,3 +113,132 @@ public class Publisher : IPublisher
 }
 
 ```
+
+Program.cs
+```
+// Add services to the container.
+builder.Services.Configure<RabbitMQConfig>(builder.Configuration.GetSection(RabbitMQConfig.RabbitMQ));
+builder.Services.AddSingleton<IPublisher, Publisher>();
+```
+
+##Subacriber API
+
+ISubscriber.cs
+```
+namespace InventoryAPI.Subscriber;
+
+public interface ISubscriber
+{
+    void ReadMessage();
+}
+```
+
+Subscriber.cs
+```
+using System.Text;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+
+namespace InventoryAPI.Subscriber;
+
+public class Subscriber : ISubscriber, IDisposable
+{
+    private IConnection _connection;
+    private IModel _channel;
+    public Subscriber()
+    {
+        var factory = new ConnectionFactory()
+        {
+            HostName = "localhost",
+            UserName = "user",
+            Password = "mypass",
+            VirtualHost = "/"
+        };
+
+        //Create Connetion
+        _connection = factory.CreateConnection();
+        _channel = _connection.CreateModel();
+        _channel.ExchangeDeclare(exchange: "Order-Exchange", type: ExchangeType.Direct);
+        _channel.QueueDeclare(queue: "Order-Queue", durable: true, exclusive: false, autoDelete: false, arguments: null);
+        _channel.QueueBind(queue: "Order-Queue", exchange: "Order-Exchange", routingKey: "Order.Init");
+        _channel.BasicQos(0, 1, false);
+
+    }
+    public void ReadMessage()
+    {
+        Console.WriteLine("Message - Started");
+        //Create ConnectionFactory
+
+        var consumer = new EventingBasicConsumer(_channel);
+        consumer.Received += (model, eventArg) =>
+        {
+            var body = eventArg.Body.ToArray();
+            var message = Encoding.UTF8.GetString(body);
+            Console.WriteLine($"Message Received: {message}");
+        };
+
+        _channel.BasicConsume(queue: "Order-Queue", autoAck: true, consumer);
+    }
+
+    public void Dispose()
+    {
+        if (_connection.IsOpen)
+        {
+            _connection.Close();
+        }
+        if (_channel.IsOpen)
+        {
+            _channel.Close();
+        }
+    }
+
+
+}
+
+```
+
+#BackgroundService.cs
+```
+using InventoryAPI.Subscriber;
+
+namespace InventoryAPI.ListenerService;
+
+public class OrderListener : BackgroundService
+{
+    private readonly ILogger<OrderListener> _logger;
+    private readonly ISubscriber _subscriber;
+
+    public OrderListener(ILogger<OrderListener> logger, ISubscriber subscriber)
+    {
+        _logger = logger;
+        _subscriber = subscriber;
+    }
+
+    public override async Task StartAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("---Start Async---");
+        _subscriber.ReadMessage();
+        await Task.CompletedTask;
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        await Task.CompletedTask;
+    }
+
+    public override async Task StopAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("---Stop Async---");
+        await Task.CompletedTask;
+    }
+}
+```
+
+Program.cs
+```
+// Add services to the container.
+builder.Services.AddSingleton<ISubscriber, Subscriber>();
+builder.Services.AddHostedService<OrderListener>();
+```
+
+
